@@ -4,6 +4,7 @@
  */
 package org.joice.cache;
 
+import org.joice.cache.config.CacheConfig;
 import org.joice.cache.to.CacheKey;
 import org.joice.cache.to.CacheWrapper;
 
@@ -16,23 +17,38 @@ public interface Cache {
 
     /**
      * 设置缓存
-     * @param key      缓存的key 
-     * @param wrapper  缓存的对象
+     * @param cacheKey 缓存的key,不能为空 
+     * @param wrapper  缓存的对象,不能为空
      */
-    void set(CacheKey key, CacheWrapper wrapper);
+    void set(CacheKey cacheKey, CacheWrapper wrapper);
 
     /**
      * 查询缓存
-     * @param key  缓存的key
-     * @return     缓存的对象
+     * @param cacheKey  缓存的key,不能为空 
+     * @return          缓存的对象
      */
-    CacheWrapper get(CacheKey key);
+    CacheWrapper get(CacheKey cacheKey);
 
     /**
      * 删除缓存
-     * @param key  缓存的key
-     * @return     缓存变化的数量
+     * @param cacheKey  缓存的key,不能为空 
+     * @return          删除缓存的数量
      */
-    int delete(CacheKey key);
+    Long delete(CacheKey cacheKey);
+
+    /**
+     * 清空缓存
+     */
+    void clear();
+
+    /**
+     * 关闭缓存 
+     */
+    void shutdown();
+
+    /**
+     * 获取缓存配置
+     */
+    CacheConfig getConfig();
 
 }

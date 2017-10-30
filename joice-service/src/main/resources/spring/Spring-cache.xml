@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                        http://www.springframework.org/schema/aop
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+                        
+    <bean id="shardedJedis" class="redis.clients.jedis.ShardedJedis">
+    	<constructor-arg>
+    		<list>
+    			<bean class="redis.clients.jedis.JedisShardInfo">
+    				<constructor-arg name="host" value="168.33.131.55" />
+    			</bean>
+    		</list>
+    	</constructor-arg>
+    </bean>
+    
+    <bean id="cache" class="org.joice.cache.redis.ShardedJedisCache">
+    	<constructor-arg ref="shardedJedis" />
+    </bean>
+                        
+    <bean id="defaultHandler" class="org.joice.cache.handler.DefaultHandler">
+    	<constructor-arg ref="cache" />
+    </bean>
+
+	<!-- 拦截@Cacheable注解 -->
+	<bean id="cacheableAspect" class="org.joice.cache.aspect.CacheableAspect" >
+		<constructor-arg ref="defaultHandler" />
+	</bean>
+	<!-- 拦截@CacheDel注解 -->
+	<bean id="cacheDelAspect" class="org.joice.cache.aspect.CacheDelAspect" >
+		<constructor-arg ref="defaultHandler" />
+	</bean>
+
+	<!-- 配置AOP -->
+	<aop:config proxy-target-class="true">
+		<aop:aspect ref="cacheableAspect">
+			<!-- 配置切点表达式 -->
+			<aop:pointcut expression="execution(* org.joice.service.busi.*.*(..)) &amp;&amp; @annotation(org.joice.cache.annotation.Cacheable)" id="busiCacheablePointcut" />
+			<aop:around method="around" pointcut-ref="busiCacheablePointcut"/>
+		</aop:aspect>
+	</aop:config>
+	
+	<aop:config proxy-target-class="true">
+		<aop:aspect ref="cacheDelAspect">
+			<!-- 配置切点表达式 -->
+			<aop:pointcut expression="execution(* org.joice.service.busi.*.*(..)) &amp;&amp; @annotation(org.joice.cache.annotation.CacheDel)" id="busiCacheDelPointcut" />
+			<aop:around method="around" pointcut-ref="busiCacheDelPointcut"/>
+		</aop:aspect>
+	</aop:config>
+
+</beans>
