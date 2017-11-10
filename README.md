@@ -28,44 +28,44 @@
 
 ```
 <bean id="FIFO" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">    
-        <property name="staticField" value="com.sunveee.joice.cache.enums.CacheDiscardStrategyEnum.FIFO" />    
-    </bean> 
-                        
-    <bean id="cacheConfig" class="com.sunveee.joice.cache.config.CacheConfig">
-    	<!-- 命名空间 -->
-    	<constructor-arg name="nameSpace" value="tomcat.joice-cache-test" />
-    	<!-- 最大缓存数量 -->
-    	<constructor-arg name="maxCacheNums" value="2" />
-    	<!-- 缓存丢弃策略 -->
-    	<constructor-arg name="cacheDiscardStrategyEnum" ref="FIFO" />
-    	<!-- 持久化文件目录 -->
-    	<constructor-arg name="persistFileFolderPath" value="D:\\项目\\缓存中间件\\tmp\\joice-cache" />
-    	<!-- 持久化文件名 -->
-    	<constructor-arg name="persistFilename" value="map.cache" />
-    	<!-- 持久化时间间隔（也是清理过期缓存的时间间隔） -->
-    	<constructor-arg name="persistTimeInterval" value="5" />
-    </bean>
-    
-    <bean id="cache" class="com.sunveee.joice.cache.impl.local.map.MapCache">
-    	<constructor-arg ref="cacheConfig" />
-    </bean>
-                        
-    <bean id="cacheHandler" class="com.sunveee.joice.cache.handler.CacheHandler">
-    	<constructor-arg ref="cache" />
-    </bean>
+	<property name="staticField" value="com.sunveee.joice.cache.enums.CacheDiscardStrategyEnum.FIFO" />    
+</bean> 
 
-	<bean id="cacheAspect" class="com.sunveee.joice.cache.aspect.CacheAspect" >
-		<constructor-arg ref="cacheHandler" />
-	</bean>
+<bean id="cacheConfig" class="com.sunveee.joice.cache.config.CacheConfig">
+	<!-- 命名空间 -->
+	<constructor-arg name="nameSpace" value="tomcat.joice-cache-test" />
+	<!-- 最大缓存数量 -->
+	<constructor-arg name="maxCacheNums" value="2" />
+	<!-- 缓存丢弃策略 -->
+	<constructor-arg name="cacheDiscardStrategyEnum" ref="FIFO" />
+	<!-- 持久化文件目录 -->
+	<constructor-arg name="persistFileFolderPath" value="D:\\项目\\缓存中间件\\tmp\\joice-cache" />
+	<!-- 持久化文件名 -->
+	<constructor-arg name="persistFilename" value="map.cache" />
+	<!-- 持久化时间间隔（也是清理过期缓存的时间间隔） -->
+	<constructor-arg name="persistTimeInterval" value="5" />
+</bean>
 
-	<!-- 配置AOP -->
-	<aop:config proxy-target-class="true">
-		<aop:aspect ref="cacheAspect">
-			<!-- 配置切点表达式 -->
-			<aop:pointcut expression="execution(* com.sunveee.template.ssm.service.impl.*.*(..)) &amp;&amp; @annotation(com.sunveee.joice.cache.annotation.Cacheable)" id="busiPointcut" />
-			<aop:around method="around" pointcut-ref="busiPointcut"/>
-		</aop:aspect>
-	</aop:config>
+<bean id="cache" class="com.sunveee.joice.cache.impl.local.map.MapCache">
+	<constructor-arg ref="cacheConfig" />
+</bean>
+
+<bean id="cacheHandler" class="com.sunveee.joice.cache.handler.CacheHandler">
+	<constructor-arg ref="cache" />
+</bean>
+
+<bean id="cacheAspect" class="com.sunveee.joice.cache.aspect.CacheAspect" >
+	<constructor-arg ref="cacheHandler" />
+</bean>
+
+<!-- 配置AOP -->
+<aop:config proxy-target-class="true">
+	<aop:aspect ref="cacheAspect">
+		<!-- 配置切点表达式 -->
+		<aop:pointcut expression="execution(* com.sunveee.template.ssm.service.impl.*.*(..)) &amp;&amp; @annotation(com.sunveee.joice.cache.annotation.Cacheable)" id="busiPointcut" />
+		<aop:around method="around" pointcut-ref="busiPointcut"/>
+	</aop:aspect>
+</aop:config>
 ```
 
 `UserServiceImpl.java`中配置如下：
